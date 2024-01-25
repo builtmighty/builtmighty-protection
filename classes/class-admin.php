@@ -93,33 +93,32 @@ class builtAdmin {
         } else {
 
             // Output. ?>
-            <form class="built-blacklist" method="POST">
-                <table>
-                    <thead>
+            <table class="built-blacklist-table">
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>Order ID</th>
+                        <th>Time</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody><?php
+
+                    // Loop through blacklist.
+                    foreach( $blacklist as $item ) { ?>
+
                         <tr>
-                            <th>IP</th>
-                            <th>Order ID</th>
-                            <th>Time</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody><?php
+                            <td><?php echo $item['ip']; ?></td>
+                            <td><?php echo $item['order_id']; ?></td>
+                            <td><?php echo $item['date']; ?></td>
+                            <td><input type="submit" name="built-remove-<?php echo $item['id']; ?>" value="×"></td>
+                        </tr><?php
 
-                        // Loop through blacklist.
-                        foreach( $blacklist as $item ) { ?>
+                    } ?>
 
-                            <tr>
-                                <td><?php echo $item['ip']; ?></td>
-                                <td><?php echo $item['order_id']; ?></td>
-                                <td><?php echo $item['date']; ?></td>
-                                <td><input type="submit" name="built-remove-<?php echo $item['id']; ?>" value="×"></td>
-                            </tr><?php
-
-                        } ?>
-
-                    </tbody>
-                </table>
-            </form><?php
+                </tbody>
+            </table>
+            <style>table.built-blacklist-table{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-blacklist-table thead th{background:#1d2327;border-radius:6px}table.built-blacklist-table tbody td,table.built-blacklist-table thead th{padding:5px 10px}table.built-blacklist-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-blacklist-table tbody tr:last-child td{border-bottom:none!important}table.built-blacklist-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-blacklist-table tbody td input[type=submit]:hover{background:0 0}</style><?php
 
         }
 
