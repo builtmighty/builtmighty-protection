@@ -34,6 +34,17 @@ define( 'BUILT_PROTECT_DOMAIN', 'builtmighty-protection' );
  */
 if( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
 
+/**
+ * Load classes.
+ * 
+ * @since   1.0.0
+ */
+require_once BUILT_PROTECT_PATH . 'classes/class-db.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-admin.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-orders.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-detection.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-protection.php';
+
 /** 
  * On activation.
  * 
@@ -41,6 +52,12 @@ if( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', 
  */
 register_activation_hook( __FILE__, 'built_protect_activation' );
 function built_protect_activation() {
+
+    // Get database class.
+    $db = new \BuiltMightyProtection\builtProtectionDB();
+
+    // Create table.
+    $db->create_table();
 
     // Flush rewrite rules.
     flush_rewrite_rules();
@@ -61,21 +78,13 @@ function built_protect_deactivation() {
 }
 
 /**
- * Load classes.
- * 
- * @since   1.0.0
- */
-require_once BUILT_PROTECT_PATH . 'classes/class-orders.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-detection.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-protection.php';
-
-/**
  * Initiate classes.
  * 
  * @since   1.0.0
  */
-new builtDetection();
-new builtProtection();
+new \BuiltMightyProtection\builtAdmin();
+new \BuiltMightyProtection\builtDetection();
+new \BuiltMightyProtection\builtProtection();
 
 /**
  * Plugin Updates. 

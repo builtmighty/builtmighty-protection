@@ -7,10 +7,13 @@
  * @package Built Mighty Protection
  * @since   1.0.0
  */
+namespace BuiltMightyProtection;
 class builtOrders {
 
     /**
      * Get customer orders.
+     * 
+     * @param   string  $ip     IP address.
      * 
      * @since   1.0.0
      */
@@ -37,6 +40,8 @@ class builtOrders {
     /**
      * Get wp_posts orders.
      * 
+     * @param   string  $ip IP address.
+     * 
      * @since   1.0.0
      */
     public function get_posts_orders( $ip ) {
@@ -44,8 +49,14 @@ class builtOrders {
         // Global.
         global $wpdb;
 
+        // Set minutes.
+        $minutes = ( ! empty( get_option( 'built_order_time' ) ) ) ? get_option( 'built_order_time' ) : 10;
+
+        // Set time.
+        $time = date( 'Y-m-d H:i:s', strtotime( '-' . $minutes . ' minutes' ) );
+
         // Set SQL.
-        $SQL = "SELECT * FROM {$wpdb->prefix}posts WHERE post_type = 'shop_order' AND post_date > '" . date( 'Y-m-d H:i:s', strtotime( '-10 minutes' ) ) . "' AND post_author = '" . $ip . "'";
+        $SQL = "SELECT * FROM {$wpdb->prefix}posts WHERE post_type = 'shop_order' AND post_date > '" . $time . "' AND post_author = '" . $ip . "'";
 
         // Get orders.
         $orders = $wpdb->get_results( $SQL );
@@ -58,6 +69,8 @@ class builtOrders {
     /**
      * Get wp_wc_orders.
      * 
+     * @param   string  $ip IP address.
+     * 
      * @since   1.0.0
      */
     public function get_wc_orders( $ip ) {
@@ -65,8 +78,14 @@ class builtOrders {
         // Global.
         global $wpdb;
 
+        // Set minutes.
+        $minutes = ( ! empty( get_option( 'built_order_time' ) ) ) ? get_option( 'built_order_time' ) : 10;
+
+        // Set time.
+        $time = date( 'Y-m-d H:i:s', strtotime( '-' . $minutes . ' minutes' ) );
+
         // Set SQL..
-        $SQL = "SELECT id FROM {$wpdb->prefix}wc_orders WHERE ip_address = '" . $ip . "' AND date_created_gmt > '" . date( 'Y-m-d H:i:s', strtotime( '-10 minutes' ) ) . "'";
+        $SQL = "SELECT id FROM {$wpdb->prefix}wc_orders WHERE ip_address = '" . $ip . "' AND date_created_gmt > '" . $time . "'";
 
         // Get orders.
         $orders = $wpdb->get_results( $SQL );

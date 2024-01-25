@@ -7,6 +7,8 @@
  * @package Built Mighty Protection
  * @since   1.0.0
  */
+namespace BuiltMightyProtection;
+use WC_Geolocation;
 class builtProtection {
 
     /**
@@ -31,7 +33,7 @@ class builtProtection {
     public function protect() {
 
         // Check for blacklisted IP.
-        if( in_array( $this->get_ip(), (array)$this->get_blacklist() ) ) {
+        if( $this->block( $this->get_ip() ) ) {
 
             // Die.
             wp_die( 'Access denied. You have been blocked from accessing this site.' );
@@ -55,22 +57,24 @@ class builtProtection {
     }
     
     /**
-     * Get blacklist.
+     * Check if user is blocked.
      * 
-     * Get the list of blacklisted IPs.
+     * Check the list of blacklisted IPs.
+     * 
+     * @param   string  $ip IP address to check.
      * 
      * @since   1.0.0
      */
-    public function get_blacklist() {
+    public function block( $ip ) {
 
-        // If the blacklist is empty, set it to an empty array.
-        if( empty( get_option( 'built_blacklist' ) ) ) return false;
+        // Get database class.
+        $db = new \BuiltMightyProtection\builtProtectionDB();
 
-        // Remove empty values.
-        $blacklist = array_filter( get_option( 'built_blacklist' ) );
+        // Get blacklist.
+        $blacklist = $db->request( "SELECT id FROM {$db->table} WHERE ip = '{$ip}'", 'row' );
 
-        // Return blacklist.
-        return get_option( 'built_blacklist' );
+        // Return.
+        return ( empty( $blacklist ) ) ? false : true;
 
     }
 

@@ -7,6 +7,7 @@
  * @package Built Mighty Protection
  * @since   1.0.0
  */
+namespace BuiltMightyProtection;
 class builtDetection {
 
     /**
@@ -16,11 +17,21 @@ class builtDetection {
      */
     public function __construct() {
 
-        // Order rate.
-        add_action( 'woocommerce_checkout_order_processed', [ $this, 'order_rate' ] );
+        // Check if order rate is enabled.
+        if( get_option( 'built_order_rate' ) ) {
 
-        // Failed payment rate.
-        add_action( 'woocommerce_checkout_order_processed', [ $this, 'failed_rate' ] );
+            // Order rate.
+            add_action( 'woocommerce_checkout_order_processed', [ $this, 'order_rate' ] );
+
+        }
+
+        // Check if failure rate is enabled.
+        if( get_option( 'built_failed_rate' ) ) {
+
+            // Failed payment rate.
+            add_action( 'woocommerce_checkout_order_processed', [ $this, 'failed_rate' ] );
+
+        }
 
     }
 
@@ -29,17 +40,27 @@ class builtDetection {
      * 
      * Monitor and detect a high order rate from a single IP address.
      * 
+     * @param   int     $order_id   Order ID.
+     * @param   array   $data       Order data.
+     * @param   object  $order      Order object.
+     * 
      * @since   1.0.0
      */
     public function order_rate( $order_id, $data, $order ) {
 
+        // Disable on admin side.
+        if( is_admin() ) return;
+
+        // CHeck if order was placed by admin user.
+        if( is_user_logged_in() && current_user_can( 'manage_options' ) ) return;
+
         // Get orders.
-        $o = new builtOrders();
+        $o = new \BuiltMightyProtection\builtOrders();
 
         // Get customer IP.
         $ip     = $order->get_customer_ip_address();
-        $time   = 10 * MINUTE_IN_SECONDS;
-        $limit  = 5;
+        $limit  = ( ! empty( get_option( 'built_order_limit' ) ) ) ? get_option( 'built_order_limit' ) : 5;
+        $time   = ( ! empty( get_option( 'built_order_time' ) ) ) ? get_option( 'built_order_time' ) * MINUTE_IN_SECONDS : 10 * MINUTE_IN_SECONDS;
 
         // Get orders.
         $orders = $o->get_orders( $ip );
@@ -60,7 +81,7 @@ class builtDetection {
             );
 
             // Add IP to blacklist.
-            $this->blacklist_ip( $ip );
+            $this->blacklist_ip( $ip, $order_id );
 
         }
 
@@ -71,9 +92,17 @@ class builtDetection {
      * 
      * Monitor and detect a high failed rate for a WooCommerce session.
      * 
+     * @param   int     $order_id   Order ID.
+     * 
      * @since   1.0.0
      */
     public function failed_rate( $order_id ) {
+
+        // Disable on admin side.
+        if( is_admin() ) return;
+
+        // CHeck if order was placed by admin user.
+        if( is_user_logged_in() && current_user_can( 'manage_options' ) ) return;
 
         // Get order.
         $order = wc_get_order( $order_id );
@@ -92,8 +121,11 @@ class builtDetection {
         // Increment current attempts and set.
         WC()->session->set( 'failed_attempts', $attempts++ );
 
+        // Set limit.
+        $limit = ( ! empty( get_option( 'built_failed_limit' ) ) ) ? get_option( 'built_failed_limit' ) : 3;
+
         // If the failed rate is greater than the limit, cancel the order.
-        if( $attempts > 3 ) {
+        if( $attempts > $limit ) {
 
             // Cancel the order.
             $order->update_status( 'cancelled', __( 'Order cancelled due to suspected fraud.', 'builtmighty-protection' ) );
@@ -107,7 +139,7 @@ class builtDetection {
             );
 
             // Add IP to blacklist.
-            $this->blacklist_ip( $ip );
+            $this->blacklist_ip( $ip, $order_id );
 
         }
 
@@ -118,23 +150,32 @@ class builtDetection {
      * 
      * Add specified IP address to blacklist.
      * 
+     * @param   string  $ip         IP address to blacklist.
+     * @param   int     $order_id   Order ID.
+     * 
      * @since   1.0.0
      */
-    public function blacklist_ip( $ip ) {
+    public function blacklist_ip( $ip, $order_id ) {
 
-        // Get blacklist.
-        $blacklist = ( ! empty( get_option( 'built_blacklist' ) ) ) ? get_option( 'built_blacklist' ) : [];
+        // Database.
+        $db = new \BuiltMightyProtection\builtProtectionDB();
+
+        // Set query.
+        $query = "SELECT id FROM $db->table WHERE ip = '$ip'";
 
         // Check if IP is already blacklisted.
-        if( in_array( $ip, $blacklist ) ) return;
+        if( $db->request( $query, 'row' ) ) return;
 
-        // Add IP to blacklist.
-        $blacklist[] = $ip;
+        // Set data.
+        $data = [
+            'ip'        => $ip,
+            'order_id'  => $order_id,
+            'date'      => date( 'Y-m-d H:i:s' )
+        ];
 
-        // Update blacklist.
-        update_option( 'built_blacklist', $blacklist );
+        // Insert data.
+        $db->insert( $data );
 
     }
-
 
 }
