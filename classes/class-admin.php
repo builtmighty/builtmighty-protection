@@ -36,7 +36,7 @@ class builtAdmin {
     public function built_tab( $tabs ) {
 
         // Add.
-        $tabs['built_settings'] = __( 'Built Mighty', BUILT_PROTECT_DOMAIN );
+        $tabs['built_settings'] = __( '🛡️ Built Mighty', BUILT_PROTECT_DOMAIN );
 
         // Return.
         return $tabs;
@@ -197,6 +197,22 @@ class builtAdmin {
             'section_failed_end' => [
                 'type'      => 'sectionend',
                 'id'        => 'wc_settings_failed_end'
+            ],
+            'section_assess_title' => [
+                'name'      => __( 'Order Assessment', BUILT_PROTECT_DOMAIN ),
+                'type'      => 'title',
+                'desc'      => 'Assess orders based on multiple criteria, for possible fraud.',
+                'id'        => 'assess_section_title'
+            ],
+            [
+                'name'      => __( 'Enable', BUILT_PROTECT_DOMAIN ),
+                'type'      => 'checkbox',
+                'desc'      => 'Enable Order Assessment',
+                'id'        => 'built_assess_rate'
+            ],
+            'section_assess_end' => [
+                'type'      => 'sectionend',
+                'id'        => 'wc_settings_assess_end'
             ],
         ];
 
