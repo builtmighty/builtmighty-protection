@@ -7,7 +7,7 @@
  * @package Built Mighty Protection
  * @since   1.0.0
  */
-namespace BuiltMightyProtection;
+namespace BuiltMightyProtect;
 class builtAdmin {
 
     /**
@@ -72,7 +72,7 @@ class builtAdmin {
         ob_start();
 
         // Get database class.
-        $db = new \BuiltMightyProtection\builtProtectionDB();
+        $db = new \BuiltMightyProtect\builtProtectionDB();
         
         // Get recent blacklist.
         $query = "SELECT * FROM $db->table ORDER BY id DESC LIMIT 10"; 
@@ -210,6 +210,12 @@ class builtAdmin {
                 'desc'      => 'Enable Order Assessment',
                 'id'        => 'built_assess_rate'
             ],
+            [
+                'name'      => __( 'Proxy Check', BUILT_PROTECT_DOMAIN ),
+                'type'      => 'password',
+                'desc'      => 'Sign-up for a <a href="https://proxycheck.io/" target="_blank">proxycheck.io</a> API key, which has 1,000 free checks per day.',
+                'id'        => 'built_proxycheck_key'
+            ],
             'section_assess_end' => [
                 'type'      => 'sectionend',
                 'id'        => 'wc_settings_assess_end'
@@ -242,7 +248,7 @@ class builtAdmin {
                 error_log( 'ID to remove: ' . $id );
 
                 // Load database class.
-                $db = new \BuiltMightyProtection\builtProtectionDB();
+                $db = new \BuiltMightyProtect\builtProtectionDB();
 
                 // Remove.
                 $db->delete( [ 'id' => (int)$id ] );
