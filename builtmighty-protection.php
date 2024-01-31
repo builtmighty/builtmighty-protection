@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: 🔒 Built Mighty Protection
+Plugin Name: 🛡️ Built Mighty Protection
 Plugin URI: https://builtmighty.com
 Description: Stop fraudulent orders in their tracks, with Built Mighty Protection.
 Version: 0.0.1
@@ -13,6 +13,8 @@ Copyright © 2024 Built Mighty. All Rights Reserved.
 
 /**
  * Disallow direct access.
+ * 
+ * @since   1.0.0
  */
 if( ! defined( 'WPINC' ) ) { die; }
 
