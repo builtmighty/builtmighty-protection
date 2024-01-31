@@ -18,18 +18,18 @@ class builtDetection {
     public function __construct() {
 
         // Check if order rate is enabled.
-        if( get_option( 'built_order_rate' ) ) {
+        if( get_option( 'built_order_rate' ) === 'yes' ) {
 
             // Order rate.
-            add_action( 'woocommerce_checkout_order_processed', [ $this, 'order_rate' ], 10, 1 );
+            add_action( 'woocommerce_new_order', [ $this, 'order_rate' ], 10, 1 );
 
         }
 
         // Check if failure rate is enabled.
-        if( get_option( 'built_failed_rate' ) ) {
+        if( get_option( 'built_failed_rate' ) === 'yes' ) {
 
             // Failed payment rate.
-            add_action( 'woocommerce_checkout_order_processed', [ $this, 'failed_rate' ], 10, 1 );
+            add_action( 'woocommerce_new_order', [ $this, 'failed_rate' ], 10, 1 );
 
         }
 
@@ -45,8 +45,6 @@ class builtDetection {
      * @since   1.0.0
      */
     public function order_rate( $order_id ) {
-
-        error_log( __FUNCTION__ . ' is running.' );
 
         // Disable on admin side.
         if( is_admin() ) return;
@@ -97,8 +95,6 @@ class builtDetection {
      * @since   1.0.0
      */
     public function failed_rate( $order_id ) {
-
-        error_log( __FUNCTION__ . ' is running.' );
 
         // Disable on admin side.
         if( is_admin() ) return;
