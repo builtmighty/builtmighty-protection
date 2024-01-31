@@ -1,13 +1,13 @@
 <?php
 /*
-Plugin Name: 🛡️ Built Mighty Protection
+Plugin Name: 🛡️ Built Mighty Protect
 Plugin URI: https://builtmighty.com
-Description: Stop fraudulent orders in their tracks, with Built Mighty Protection.
+Description: Stop fraudulent orders in their tracks, with Built Mighty Protect.
 Version: 0.0.1
 Author: Built Mighty
 Author URI: https://builtmighty.com
 Copyright: Built Mighty
-Text Domain: builtmighty-protection
+Text Domain: builtmighty-protect
 Copyright © 2024 Built Mighty. All Rights Reserved.
 */
 
@@ -24,10 +24,10 @@ if( ! defined( 'WPINC' ) ) { die; }
  * @since   1.0.0
  */
 define( 'BUILT_PROTECT_VERSION', '0.0.1' );
-define( 'BUILT_PROTECT_NAME', 'builtmighty-protection' );
+define( 'BUILT_PROTECT_NAME', 'builtmighty-protect' );
 define( 'BUILT_PROTECT_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'BUILT_PROTECT_URI', trailingslashit( plugin_dir_url( __FILE__ ) ) );
-define( 'BUILT_PROTECT_DOMAIN', 'builtmighty-protection' );
+define( 'BUILT_PROTECT_DOMAIN', 'builtmighty-protect' );
 
 /**
  * Stop if WooCommerce is not active.
@@ -56,7 +56,7 @@ register_activation_hook( __FILE__, 'built_protect_activation' );
 function built_protect_activation() {
 
     // Get database class.
-    $db = new \BuiltMightyProtection\builtProtectionDB();
+    $db = new \BuiltMightyProtect\builtProtectionDB();
 
     // Create table.
     $db->create_table();
@@ -84,9 +84,9 @@ function built_protect_deactivation() {
  * 
  * @since   1.0.0
  */
-new \BuiltMightyProtection\builtAdmin();
-new \BuiltMightyProtection\builtDetection();
-new \BuiltMightyProtection\builtProtection();
+new \BuiltMightyProtect\builtAdmin();
+new \BuiltMightyProtect\builtDetection();
+new \BuiltMightyProtect\builtProtection();
 
 /**
  * Plugin Updates. 
