@@ -5,7 +5,7 @@
  * @since   1.0.0
  * @author  Built Mighty
  */
-namespace BuiltMightyProtection;
+namespace BuiltMightyProtect;
 class builtProtectionDB {
 
     /**

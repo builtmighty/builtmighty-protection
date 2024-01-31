@@ -7,7 +7,7 @@
  * @package Built Mighty Protection
  * @since   1.0.0
  */
-namespace BuiltMightyProtection;
+namespace BuiltMightyProtect;
 use WC_Geolocation;
 class builtProtection {
 
@@ -68,7 +68,7 @@ class builtProtection {
     public function block( $ip ) {
 
         // Get database class.
-        $db = new \BuiltMightyProtection\builtProtectionDB();
+        $db = new \BuiltMightyProtect\builtProtectionDB();
 
         // Get blacklist.
         $blacklist = $db->request( "SELECT id FROM {$db->table} WHERE ip = '{$ip}'", 'row' );

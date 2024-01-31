@@ -7,7 +7,7 @@
  * @package Built Mighty Protection
  * @since   1.0.0
  */
-namespace BuiltMightyProtection;
+namespace BuiltMightyProtect;
 class builtDetection {
 
     /**
@@ -53,7 +53,7 @@ class builtDetection {
         if( is_user_logged_in() && current_user_can( 'manage_options' ) ) return;
 
         // Get orders.
-        $o = new \BuiltMightyProtection\builtOrders();
+        $o = new \BuiltMightyProtect\builtOrders();
 
         // Get customer IP.
         $ip     = $order->get_customer_ip_address();
@@ -156,7 +156,7 @@ class builtDetection {
     public function blacklist_ip( $ip, $order_id ) {
 
         // Database.
-        $db = new \BuiltMightyProtection\builtProtectionDB();
+        $db = new \BuiltMightyProtect\builtProtectionDB();
 
         // Set query.
         $query = "SELECT id FROM $db->table WHERE ip = '$ip'";

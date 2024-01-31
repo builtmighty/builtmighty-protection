@@ -7,7 +7,7 @@
  * @package Built Mighty Protection
  * @since   1.0.0
  */
-namespace BuiltMightyProtection;
+namespace BuiltMightyProtect;
 class builtOrders {
 
     /**
