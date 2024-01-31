@@ -21,7 +21,7 @@ class builtDetection {
         if( get_option( 'built_order_rate' ) ) {
 
             // Order rate.
-            add_action( 'woocommerce_checkout_order_processed', [ $this, 'order_rate' ] );
+            add_action( 'woocommerce_checkout_order_processed', [ $this, 'order_rate' ], 10, 1 );
 
         }
 
@@ -29,7 +29,7 @@ class builtDetection {
         if( get_option( 'built_failed_rate' ) ) {
 
             // Failed payment rate.
-            add_action( 'woocommerce_checkout_order_processed', [ $this, 'failed_rate' ] );
+            add_action( 'woocommerce_checkout_order_processed', [ $this, 'failed_rate' ], 10, 1 );
 
         }
 
@@ -41,17 +41,17 @@ class builtDetection {
      * Monitor and detect a high order rate from a single IP address.
      * 
      * @param   int     $order_id   Order ID.
-     * @param   array   $data       Order data.
-     * @param   object  $order      Order object.
      * 
      * @since   1.0.0
      */
-    public function order_rate( $order_id, $data, $order ) {
+    public function order_rate( $order_id ) {
+
+        error_log( __FUNCTION__ . ' is running.' );
 
         // Disable on admin side.
         if( is_admin() ) return;
 
-        // CHeck if order was placed by admin user.
+        // Check if order was placed by admin user.
         if( is_user_logged_in() && current_user_can( 'manage_options' ) ) return;
 
         // Get orders.
@@ -97,6 +97,8 @@ class builtDetection {
      * @since   1.0.0
      */
     public function failed_rate( $order_id ) {
+
+        error_log( __FUNCTION__ . ' is running.' );
 
         // Disable on admin side.
         if( is_admin() ) return;
