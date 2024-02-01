@@ -8,7 +8,7 @@
  * @since   1.0.0
  */
 namespace BuiltMightyProtect;
-class builtDetection {
+class builtAssessment {
 
     /**
      * Construct.
