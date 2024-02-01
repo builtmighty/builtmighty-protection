@@ -46,6 +46,7 @@ require_once BUILT_PROTECT_PATH . 'classes/class-admin.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-orders.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-detection.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-protection.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-assessment.php';
 
 /** 
  * On activation.
