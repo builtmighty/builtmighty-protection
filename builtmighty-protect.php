@@ -88,6 +88,7 @@ function built_protect_deactivation() {
 new \BuiltMightyProtect\builtAdmin();
 new \BuiltMightyProtect\builtDetection();
 new \BuiltMightyProtect\builtProtection();
+new \BuiltMightyProtect\builtAssessment();
 
 /**
  * Plugin Updates. 
