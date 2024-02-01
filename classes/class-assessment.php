@@ -57,7 +57,8 @@ class builtAssessment {
         $rating += $this->first_order( $order );
 
         // Save rating.
-        update_post_meta( $order_id, 'built_order_rating', $rating );
+        $order->add_meta_data( 'built_order_rating', $rating, true );
+        $order->save();
 
     }
 
@@ -77,8 +78,11 @@ class builtAssessment {
         $country    = $order->get_billing_country();
         $phone      = preg_replace( '/[^A-Za-z0-9\-]/', '', str_replace( ' ', '', trim( $order->get_billing_phone() ) ) );
 
+        // Get countries.
+        $countries  = $this->phone_countries();
+
         // Get the billing phone code.
-        $code       = array_search( $country, $this->phone_countries(), true );
+        $code       = ( isset( $countries[$country] ) ) ? $countries[$country] : '';
 
         // Check if we have a code.
         if( empty( $code ) ) return 0;
@@ -427,7 +431,7 @@ class builtAssessment {
             'US' => '1',
             'UY' => '598',
             'UZ' => '998',
-            'VA' => '379',
+            'VA' => '39',
             'VC' => '1784',
             'VE' => '58',
             'VG' => '1284',
@@ -436,12 +440,12 @@ class builtAssessment {
             'VU' => '678',
             'WF' => '681',
             'WS' => '685',
-            'XK' => '383',
+            'XK' => '381',
             'YE' => '967',
             'YT' => '262',
             'ZA' => '27',
             'ZM' => '260',
-            'ZW' => '263', 
+            'ZW' => '263',
         ];
 
     }
