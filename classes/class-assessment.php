@@ -41,20 +41,27 @@ class builtAssessment {
         // Disable on admin side.
         if( is_admin() ) return;
 
-        // Check if order was placed by admin user.
-        if( is_user_logged_in() && current_user_can( 'manage_options' ) ) return;
-
         // Get the order.
         $order = wc_get_order( $order_id );
 
         // Set rating.
-        $rating = 0;
+        $rating = 100;
 
-        // Add rating.
-        $rating += $this->billing_phone( $order );
-        $rating += $this->international_order( $order );
-        $rating += $this->proxy_ip( $order->get_customer_ip_address() );
-        $rating += $this->first_order( $order );
+        // Check if order was placed by admin user.
+        if( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
+
+            // Set rating to 100, because we trust admins.
+            $rating = 100;
+
+        } else {
+
+            // Add rating.
+            $rating -= $this->billing_phone( $order );
+            $rating -= $this->international_order( $order );
+            $rating -= $this->proxy_ip( $order->get_customer_ip_address() );
+            $rating -= $this->first_order( $order );
+
+        }
 
         // Save rating.
         $order->add_meta_data( 'built_order_rating', $rating, true );
