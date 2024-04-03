@@ -2,7 +2,7 @@
 /**
  * Actions.
  * 
- * Adds admin columns and actions for orders.
+ * Different actions across the plugin.
  * 
  * @package Built Mighty Protection
  * @since   1.0.0
@@ -11,140 +11,133 @@ namespace BuiltMightyProtect;
 class builtActions {
 
     /**
-     * Construct.
+     * Whitelist.
+     * 
+     * @param   string  $ip         IP address to whitelist.
      * 
      * @since   1.0.0
      */
-    public function __construct() {
+    public function whitelist_ip( $ip ) {
 
-        // Add columns.
-        add_filter( 'woocommerce_shop_order_list_table_columns', [ $this, 'add_columns' ] );
+        // Database.
+        $db = new \BuiltMightyProtect\builtProtectionDB();
 
-        // Add data.
-        add_action( 'manage_woocommerce_page_wc-orders_custom_column', [ $this, 'add_data' ], 10, 2 );
+        // Set whitelist query.
+        $query = "SELECT id FROM $db->whitelist WHERE ip = '$ip'";
 
-        // Add metabox to orders.
-        add_action( 'add_meta_boxes', [ $this, 'add_meta_box' ] );
+        // Check if IP is already whitelisted.
+        if( $db->request( $query, 'row' ) ) return;
 
-        // Admin styles.
-        add_action( 'admin_footer', [ $this, 'admin_styles' ] );
+        // Set blacklist query.
+        $query = "SELECT id FROM $db->protect WHERE ip = '$ip'";
+
+        // Check if IP is already blacklisted.
+        if( $db->request( $query, 'row' ) ) $this->blacklist_remove( $ip );
+
+        // Set data.
+        $data = [
+            'ip'        => $ip,
+            'date'      => date( 'Y-m-d H:i:s' )
+        ];
+
+        // Insert data.
+        $db->insert( $db->whitelist, $data );
 
     }
 
     /**
-     * Add columns.
+     * Whitelist remove.
      * 
-     * @param   array   $columns    Columns.
+     * Remove IP address from whitelist.
+     * 
+     * @param   string  $ip     IP address to remove.
      * 
      * @since   1.0.0
      */
-    public function add_columns( $columns ) {
+    public function whitelist_remove( $ip ) {
 
-        // Set new columns.
-        $columns['built_order'] = __( '<span style="width:100px;display:block;text-align:center;">🛡️</span>', 'builtmighty' );
+        // Database.
+        $db = new \BuiltMightyProtect\builtProtectionDB();
 
-        // Return columns.
-        return $columns;
+        // Remove from blacklist.
+        $db->delete( $db->whitelist, [ 'ip' => $ip ] );
 
     }
 
     /**
-     * Add data.
+     * Blacklist IP.
      * 
-     * @param   string  $column     Column.
+     * Add specified IP address to blacklist.
+     * 
+     * @param   string  $ip         IP address to blacklist.
+     * @param   int     $order_id   Order ID.
      * 
      * @since   1.0.0
      */
-    public function add_data( $column, $order ) {
+    public function blacklist_ip( $ip, $order_id ) {
 
-        // Check column.
-        if( $column == 'built_order' ) {
+        // Database.
+        $db = new \BuiltMightyProtect\builtProtectionDB();
 
-            // Set rating.
-            $rating = ( ! empty( $order->get_meta( 'built_order_rating' ) ) ) ? $order->get_meta( 'built_order_rating' ) : 0;
+        // Set whitelist query.
+        $query = "SELECT id FROM $db->whitelist WHERE ip = '$ip'";
 
-            // Output. ?>
-            <div class="built-protect-rating">
-                <div class="built-protect-rating-bar">
-                    <div class="built-protect-rating-bar-inner" data-rating="<?php echo $rating; ?>" style="width:<?php echo $rating; ?>%;background:<?php echo $this->get_color( $rating ); ?>"></div>
-                </div>
-                <div class="built-protect-rating-bar-number" style="color:<?php echo $this->get_color( $rating ); ?>"><?php echo $rating; ?>%</div>
-            </div><?php
+        // Check if IP is whitelisted.
+        if( $db->request( $query, 'row' ) ) return;
 
-        }
+        // Set blacklist query.
+        $query = "SELECT id FROM $db->protect WHERE ip = '$ip'";
+
+        // Check if IP is already blacklisted.
+        if( $db->request( $query, 'row' ) ) return;
+
+        // Set data.
+        $data = [
+            'ip'        => $ip,
+            'order_id'  => $order_id,
+            'date'      => date( 'Y-m-d H:i:s' )
+        ];
+
+        // Insert data.
+        $db->insert( $db->protect, $data );
 
     }
 
     /**
-     * Add meta box to orders.
+     * Blacklist remove.
+     * 
+     * Remove IP address from blacklist.
+     * 
+     * @param   string  $ip     IP address to remove.
      * 
      * @since   1.0.0
      */
-    public function add_meta_box() {
+    public function blacklist_remove( $ip ) {
 
-        // Add metabox.
-        add_meta_box( 'built_order_rating', __( 'Order Rating', 'builtmighty' ), [ $this, 'meta_box' ], 'shop_order', 'side', 'core' );
+        // Database.
+        $db = new \BuiltMightyProtect\builtProtectionDB();
+
+        // Remove from blacklist.
+        $db->delete( $db->protect, [ 'ip' => $ip ] );
 
     }
 
     /**
-     * Admin styles.
+     * Assess the order.
+     * 
+     * Monitor and assess the order for potential fraud.
+     * 
+     * @param   int     $order_id   Order ID.
      * 
      * @since   1.0.0
      */
-    public function admin_styles() { ?>
-    
-        <style>.built-protect-rating-bar{height:10px;background:rgb(0 0 0 / 15%);width:100px;border-radius:6px;padding:2px}.built-protect-rating-bar-inner{height:8px;padding:1px;border-radius:6px;max-width:99px}.built-protect-rating-bar-number{font-weight:700;font-size:12px}</style><?php
+    public function assess_order( $order_id ) {
 
-    }
+        // Assess.
+        $assess = new \BuiltMightyProtect\builtAssessment();
 
-    /**
-     * Get color.
-     * 
-     * @since   1.0.0
-     */
-    public function get_color( $rating ) {
-
-        // Set color scale.
-        if( $rating >= 90 ) {
-
-            // Set to green.
-            $color = '#0d8c2d';
-            
-        } elseif( $rating >= 80 && $rating < 90 ) {
-
-            // Set to light green.
-            $color = '#578c0d';
-
-        } elseif( $rating >= 70 && $rating < 80 ) {
-
-            // Set to yellow-green.
-            $color = '#798c0d';
-
-        } elseif( $rating >= 60 && $rating < 70 ) {
-
-            // Set to yellow.
-            $color = '#8c7f0d';
-
-        } elseif( $rating >= 50 && $rating < 60 ) {
-
-            // Set to yellow-orange.
-            $color = '#8c5b0d';
-
-        } elseif( $rating >= 40 && $rating < 50 ) {
-
-            // Set to orange.
-            $color = '#8c3b0d';
-
-        } elseif( $rating < 40 ) {
-
-            // Set to red.
-            $color = '#8c0d0d';
-
-        }
-
-        // Return color.
-        return $color;
+        // Assess order.
+        $assess->assess_order( $order_id );
 
     }
 

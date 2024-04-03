@@ -9,7 +9,6 @@
  * @author  Built Mighty
  */
 namespace BuiltMightyProtect;
-define( 'HTML_EMAIL_HEADERS', [ 'Content-Type: text/html; charset=UTF-8' ] );
 class builtMail {
     
     /**
@@ -46,7 +45,7 @@ class builtMail {
         $html_message = $wc_email->style_inline($wrapped_message);
 
         // Send the email using wordpress mail function
-        wp_mail( $email, $subject, $html_message, HTML_EMAIL_HEADERS, $attachment );
+        wp_mail( $email, $subject, $html_message, $this->headers, $attachment );
 
     }
 

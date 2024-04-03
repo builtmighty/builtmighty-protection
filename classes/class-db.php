@@ -27,8 +27,10 @@ class builtProtectionDB {
         global $wpdb, $table_prefix;
 
         // Set variables.
-        $this->db       = $wpdb;
-        $this->table    = $table_prefix . 'built_protect';
+        $this->db           = $wpdb;
+        $this->prefix       = $table_prefix;
+        $this->protect      = $table_prefix . 'built_protect';
+        $this->whitelist    = $table_prefix . 'built_whitelist';
 
     }
 
@@ -76,10 +78,10 @@ class builtProtectionDB {
      * 
      * @since   1.0.0
      */
-    public function insert( $data ) {
+    public function insert( $table, $data ) {
 
         // Insert.
-        $this->db->insert( $this->table, $data );
+        $this->db->insert( $table, $data );
 
     }
 
@@ -91,10 +93,10 @@ class builtProtectionDB {
      * 
      * @since   1.0.0
      */
-    public function update( $data, $where ) {
+    public function update( $table, $data, $where ) {
 
         // Update.
-        $this->db->update( $this->table, $data, $where );
+        $this->db->update( $table, $data, $where );
 
     }
 
@@ -105,10 +107,10 @@ class builtProtectionDB {
      * 
      * @since   1.0.0
      */
-    public function delete( $data ) {
+    public function delete( $table, $data ) {
 
         // Delete.
-        $this->db->delete( $this->table, $data );
+        $this->db->delete( $table, $data );
 
     }
 
@@ -122,35 +124,37 @@ class builtProtectionDB {
         // Globals.
         global $table_prefix, $wpdb;
 
-        // Set table.
-        $table = $table_prefix . 'built_protect';
+        // Loop through tables.
+        foreach( $this->get_schema() as $table => $columns ) {
 
-        // Creat table, if it doesn't exist.
-        if( $wpdb->get_var( "SHOW TABLES LIKE '$table'" ) != $table ) {
+            // Set table.
+            $table = $table_prefix . $table;
 
-            // Set SQL.
-            $sql = "CREATE TABLE $table (";
+            // Creat table, if it doesn't exist.
+            if( $wpdb->get_var( "SHOW TABLES LIKE '$table'" ) != $table ) {
 
-            // Get structure.
-            $structure = $this->get_schema();
+                // Set SQL.
+                $sql = "CREATE TABLE $table (";
 
-            // Loop.
-            foreach( $structure as $column => $setting ) {
+                // Loop.
+                foreach( $columns as $column => $setting ) {
 
-                // Add to SQL.
-                $sql .= "\n`" . $column . "` " . $setting . ',';
+                    // Add to SQL.
+                    $sql .= "\n`" . $column . "` " . $setting . ',';
+
+                }
+
+                // Finish SQL.
+                $sql .= "PRIMARY KEY  (id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+                // Require.
+                require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+                // Create table.
+                dbDelta( $sql );
 
             }
-
-            // Finish SQL.
-            $sql .= "PRIMARY KEY  (id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-
-            // Require.
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-            // Create table.
-            dbDelta( $sql );
 
         }
 
@@ -165,10 +169,17 @@ class builtProtectionDB {
 
         // Set.
         $structure = [
-            'id'        => 'int(11) NOT NULL AUTO_INCREMENT',
-            'ip'        => 'varchar(255) NOT NULL',
-            'order_id'  => 'int(11) NOT NULL',
-            'date'      => 'datetime NOT NULL',
+            'built_protect'     => [
+                'id'        => 'int(11) NOT NULL AUTO_INCREMENT',
+                'ip'        => 'varchar(255) NOT NULL',
+                'order_id'  => 'int(11) NOT NULL',
+                'date'      => 'datetime NOT NULL',
+            ],
+            'built_whitelist'   => [
+                'id'        => 'int(11) NOT NULL AUTO_INCREMENT',
+                'ip'        => 'varchar(255) NOT NULL',
+                'date'      => 'datetime NOT NULL',
+            ]
         ];
 
         // Return.

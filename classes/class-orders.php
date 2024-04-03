@@ -11,6 +11,177 @@ namespace BuiltMightyProtect;
 class builtOrders {
 
     /**
+     * Construct.
+     * 
+     * @since   1.0.0
+     */
+    public function __construct() {
+
+        // Actions.
+        add_action( 'add_meta_boxes', [ $this, 'add_metabox' ], 10, 1 );
+        add_action( 'woocommerce_process_shop_order_meta', [ $this, 'order_save' ], 10, 1 );
+
+    }
+
+    /**
+     * Add meta box.
+     * 
+     * @since   1.0.0
+     */
+    public function add_metabox() {
+
+        // Check storage.
+        if( $this->hpos() ) {
+
+            // Add metabox.
+            add_meta_box( 
+                'built_protect', 
+                '🛡️ Protect', 
+                [ $this, 'metabox_content' ],
+                'woocommerce_page_wc-orders', 
+                'side', 
+                'high' 
+            );
+
+        } else {
+
+            // Add legacy metabox.
+            add_meta_box( 
+                'built_protect', 
+                '🛡️ Protect', 
+                [ $this, 'metabox_content' ], 
+                'shop_order', 
+                'side', 
+                'high' 
+            );
+
+        }
+
+    }
+
+    /**
+     * Metabox content.
+     * 
+     * @since   1.0.0
+     */
+    public function metabox_content() {
+
+        // Check storage.
+        if( $this->hpos() ) {
+
+            // Global.
+            global $post, $thepostid, $theorder;
+
+            // Get order.
+            $order = $theorder;
+
+        } else {
+
+            // Global.
+            global $post;
+
+            // Get order.
+            $order = wc_get_order( $post->ID );
+
+        }
+
+        // Classes.
+        $assess = new \BuiltMightyProtect\builtAssessment();
+        $status = new \BuiltMightyProtect\builtProtection();
+
+        // Wrap. ?>
+        <div class="built-protect-order built-protect-order-rating"><?php
+
+            // Check for rating.
+            if( $assess->get_rating( $order->get_id() ) == 'unrated' ) {
+
+                // Get assessment. ?>
+                <form method="post">
+                    <input type="hidden" name="built_assess" value="<?php echo $order->get_id(); ?>">
+                    <button type="submit" class="button button-primary">Assess Order</button>
+                </form><?php
+
+            } else {
+
+                // Output assessment.
+                echo $assess->get_assessment( $order->get_id() );
+
+            } ?>
+
+        </div>
+        <div class="built-protect-order built-protect-order-actions" data-ip="<?php echo $order->get_customer_ip_address(); ?>"><?php
+
+            // Check if blocked.
+            if( $status->block( $order->get_customer_ip_address() ) ) {
+
+                // Blocked. ?>
+                <div class="built-protect-order-status">
+                    <span class="dashicons dashicons-no-alt"></span> Blocked
+                </div><?php
+
+                // Unblock. ?>
+                <form method="post">
+                    <button type="submit" name="built_unblock" value="<?php echo $order->get_customer_ip_address(); ?>" class="button button-primary">Unblock IP</button>
+                </form><?php
+
+            } else {
+
+                // Not blocked. ?>
+                <div class="built-protect-order-status">
+                    <span class="dashicons dashicons-yes-alt"></span> Unblocked
+                </div><?php
+
+                // Block. ?>
+                <form method="post">
+                    <button type="submit" name="built_block" value="<?php echo $order->get_customer_ip_address(); ?>" class="button button-primary">Block IP</button>
+                </form><?php
+
+            } ?>
+
+        </div>
+        <style>.built-protect-order{margin:15px 0 0}.built-protect-order-actions{display:flex;align-items:center}.built-protect-order-actions>button,.built-protect-order-actions>div{flex:1}</style><?php
+
+    }
+
+    /**
+     * On order save.
+     * 
+     * @param   int     $order_id   Order ID.
+     * 
+     * @since   1.0.0
+     */
+    public function order_save( $order_id ) {
+
+        // Check for assessment.
+        if( ! empty( $_POST['built_assess'] ) ) {
+
+            // Get assessment.
+            $assess = new \BuiltMightyProtect\builtAssessment();
+
+            // Assess order.
+            $assess->assess_order( (int)$_POST['built_assess'] );
+
+        } elseif( ! empty( $_POST['built_block'] ) ) {
+
+            // Actions.
+            $action = new \BuiltMightyProtect\builtActions();
+
+            // Add IP to blacklist.
+            $action->blacklist_ip( $_POST['built_block'], $_POST['post_ID'] );
+
+        } elseif( ! empty( $_POST['built_unblock'] ) ) {
+
+            // Actions.
+            $action = new \BuiltMightyProtect\builtActions();
+
+            // Remove IP from blacklist.
+            $action->blacklist_remove( $_POST['built_unblock'] );
+
+        }
+
+    }
+
+    /**
      * Get customer orders.
      * 
      * @param   string  $ip     IP address.
@@ -20,7 +191,7 @@ class builtOrders {
     public function get_orders( $ip ) {
 
         // Check type.
-        if( $this->storage() ) {
+        if( $this->hpos() ) {
 
             // Get orders.
             $orders = $this->get_wc_orders( $ip );
@@ -96,14 +267,19 @@ class builtOrders {
     }
 
     /**
-     * Get storage type.
+     * Check for high-performance order storage.
      * 
-     * Determines if site is using new WooCommerce tables or not.
+     * Determines if site is using new WooCommerce HPOS.
+     * 
+     * @since   1.0.0
      */
-    public function storage() {
+    public function hpos() {
 
         // Global.
         global $wpdb;
+
+        // Check if in HPOS mode.
+        if( get_option( 'woocommerce_custom_orders_table_enabled' ) == 'yes' ) return true;
 
         // Check if table exists.
         if( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}wc_orders'" ) != $wpdb->prefix . 'wc_orders' ) return false;

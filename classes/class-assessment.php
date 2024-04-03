@@ -21,7 +21,7 @@ class builtAssessment {
         if( get_option( 'built_assess_rate' ) === 'yes' ) {
 
             // Order rate.
-            add_action( 'woocommerce_new_order', [ $this, 'order_assess' ], 10, 1 );
+            add_action( 'woocommerce_new_order', [ $this, 'assess_order' ], 10, 1 );
 
         }
 
@@ -36,36 +36,136 @@ class builtAssessment {
      * 
      * @since   1.0.0
      */
-    public function order_assess( $order_id ) {
-
-        // Disable on admin side.
-        if( is_admin() ) return;
+    public function assess_order( $order_id ) {
 
         // Get the order.
-        $order = wc_get_order( $order_id );
+        $order = wc_get_order( (int)$order_id );
 
         // Set rating.
         $rating = 100;
 
-        // Check if order was placed by admin user.
-        if( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
+        // Check if order was placed by user.
+        if( $order->get_customer_id() !== 0 ) {
 
-            // Set rating to 100, because we trust admins.
-            $rating = 100;
+            // Get user.
+            $user = get_user_by( 'ID', $order->get_customer_id() );
+
+            // Check if user is admin.
+            if( in_array( 'administrator', (array)$user->roles ) ) {
+
+                // Set rating to 100, because we trust admins.
+                $rating = 100;
+
+            } else {
+
+                // Rate.
+                $rating = $this->rate_order( $rating, $order );
+
+            }
 
         } else {
 
-            // Add rating.
-            $rating -= $this->billing_phone( $order );
-            $rating -= $this->international_order( $order );
-            $rating -= $this->proxy_ip( $order->get_customer_ip_address() );
-            $rating -= $this->first_order( $order );
+            // Rate.
+            $rating = $this->rate_order( $rating, $order );
 
         }
 
         // Save rating.
         $order->add_meta_data( 'built_order_rating', $rating, true );
         $order->save();
+
+    }
+
+    /** 
+     * Rate order.
+     * 
+     * Rate the order based on the assessment.
+     * 
+     * @param   WC_Order    $order  The order.
+     * 
+     * @since   1.0.0
+     */
+    public function rate_order( $rating, $order ) {
+
+        // Adjust rating.
+        $rating -= $this->billing_phone( $order );
+        $rating -= $this->international_order( $order );
+        $rating -= $this->proxy_ip( $order->get_customer_ip_address() );
+        $rating -= $this->first_order( $order );
+
+        // Return rating.
+        return $rating;
+
+    }
+
+    /**
+     * Get rating.
+     * 
+     * Get the rating for the order.
+     * 
+     * @param   int     $order_id   Order ID.
+     * 
+     * @since   1.0.0
+     */
+    public function get_rating( $order_id ) {
+
+        // Get order.
+        $order = wc_get_order( $order_id );
+
+        // Check if we have an order.
+        if( ! $order ) return false;
+
+        // Get rating.
+        $rating = ( ! empty( $order->get_meta( 'built_order_rating' ) ) ) ? $order->get_meta( 'built_order_rating' ) : 'unrated';
+
+        // Return.
+        return $rating;
+
+    }
+
+    /**
+     * Get assessment.
+     * 
+     * Get the assessment HTML for the order.
+     * 
+     * @param   int     $order_id   Order ID.
+     * 
+     * @since   1.0.0
+     */
+    public function get_assessment( $order_id ) {
+
+        // Get order.
+        $order = wc_get_order( $order_id );
+
+        // Check if we have an order.
+        if( ! $order ) return;
+
+        // Start output buffering.
+        ob_start();
+
+        // Set rating.
+        $rating = $this->get_rating( $order_id );
+
+        // Check rating.
+        if( $rating == 'unrated' ) {
+
+            // Output unrated.?>
+            <p style="text-align:center;">Unrated</p><?php
+
+        } else {
+
+            // Output rating. ?>
+            <div class="built-protect-rating">
+                <div class="built-protect-rating-bar" style="margin:0 auto">
+                    <div class="built-protect-rating-bar-inner" data-rating="<?php echo $rating; ?>" style="width:<?php echo $rating; ?>%;background:<?php echo $this->get_color( $rating ); ?>"></div>
+                </div>
+                <div class="built-protect-rating-bar-number" style="color:<?php echo $this->get_color( $rating ); ?>;text-align:center"><?php echo $rating; ?>%</div>
+            </div><?php
+
+        }
+
+        // Return.
+        return ob_get_clean();
 
     }
 
@@ -612,6 +712,56 @@ class builtAssessment {
             'mail.cz.cc',
             '10minutemail.com',
         ];
+
+    }
+
+    /**
+     * Get color.
+     * 
+     * @since   1.0.0
+     */
+    public function get_color( $rating ) {
+
+        // Set color scale.
+        if( $rating >= 90 ) {
+
+            // Set to green.
+            $color = '#0d8c2d';
+            
+        } elseif( $rating >= 80 && $rating < 90 ) {
+
+            // Set to light green.
+            $color = '#578c0d';
+
+        } elseif( $rating >= 70 && $rating < 80 ) {
+
+            // Set to yellow-green.
+            $color = '#798c0d';
+
+        } elseif( $rating >= 60 && $rating < 70 ) {
+
+            // Set to yellow.
+            $color = '#8c7f0d';
+
+        } elseif( $rating >= 50 && $rating < 60 ) {
+
+            // Set to yellow-orange.
+            $color = '#8c5b0d';
+
+        } elseif( $rating >= 40 && $rating < 50 ) {
+
+            // Set to orange.
+            $color = '#8c3b0d';
+
+        } elseif( $rating < 40 ) {
+
+            // Set to red.
+            $color = '#8c0d0d';
+
+        }
+
+        // Return color.
+        return $color;
 
     }
 

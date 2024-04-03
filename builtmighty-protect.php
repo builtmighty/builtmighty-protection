@@ -43,12 +43,13 @@ if( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', 
  */
 require_once BUILT_PROTECT_PATH . 'classes/class-db.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-admin.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-mail.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-assessment.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-actions.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-mail.php';
+require_once BUILT_PROTECT_PATH . 'classes/class-columns.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-orders.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-detection.php';
 require_once BUILT_PROTECT_PATH . 'classes/class-protection.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-assessment.php';
 
 /** 
  * On activation.
@@ -88,10 +89,11 @@ function built_protect_deactivation() {
  * @since   1.0.0
  */
 new \BuiltMightyProtect\builtAdmin();
-new \BuiltMightyProtect\builtActions();
+new \BuiltMightyProtect\builtColumns();
 new \BuiltMightyProtect\builtDetection();
 new \BuiltMightyProtect\builtProtection();
 new \BuiltMightyProtect\builtAssessment();
+new \BuiltMightyProtect\builtOrders();
 
 /**
  * Plugin Updates. 

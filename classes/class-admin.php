@@ -8,6 +8,7 @@
  * @since   1.0.0
  */
 namespace BuiltMightyProtect;
+use WC_Geolocation;
 class builtAdmin {
 
     /**
@@ -53,11 +54,95 @@ class builtAdmin {
         // Remove.
         $this->remove( $_POST );
 
+        // Add.
+        $this->add( $_POST );
+
         // Settings.
         woocommerce_admin_fields( $this->get_settings() );
 
+        // Whitelist.
+        $this->get_whitelist();
+
         // Blacklist.
         $this->get_blacklist();
+
+    }
+
+    /**
+     * Whitelist.
+     * 
+     * @since   1.0.0
+     */
+    public function get_whitelist() {
+
+        // Start output buffering.
+        ob_start();
+
+        // Get database class.
+        $db = new \BuiltMightyProtect\builtProtectionDB();
+        
+        // Get recent blacklist.
+        $query = "SELECT * FROM $db->whitelist ORDER BY id DESC LIMIT 10"; 
+        
+        // Get whitelist.
+        $whitelist = $db->request( $query, 'results' );
+        
+        // Get IP.
+        $ip = ( NULL !== WC_Geolocation::get_ip_address() ) ? WC_Geolocation::get_ip_address() : $_SERVER['REMOTE_ADDR']; ?>
+
+        <h2>Whitelist</h2>
+        <p>Add an IP address to the whitelist, so that it isn't blocked from accessing the site. Your IP is: <code><?php echo $ip; ?></code><?php
+
+        // Add to whitelist. ?>
+        <div class="built-whitelist-add">
+            <form method="post">
+                <input type="text" name="built-whitelist-ip" placeholder="IP Address">
+                <input type="submit" class="button-primary woocommerce-save-button" name="built-whitelist-add" value="+">
+            </form>
+        </div><?php
+
+        // Check if empty.
+        if( empty( $whitelist ) ) {
+
+            // Output. ?>
+            <div class="built-whitelist built-whitelist-empty">
+                <p>Whitelist Empty</p>
+            </div><?php
+            
+        } else {
+
+            // Output. ?>
+            <table class="built-whitelist-table">
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>Time</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody><?php
+
+                    // Loop through whitelist.
+                    foreach( $whitelist as $item ) { ?>
+
+                        <tr>
+                            <td><?php echo $item['ip']; ?></td>
+                            <td><?php echo $item['date']; ?></td>
+                            <td><input type="submit" name="built-whitelist-remove-<?php echo $item['id']; ?>" value="×"></td>
+                        </tr><?php
+
+                    } ?>
+
+                </tbody>
+            </table><?php
+
+        }
+        
+        // Styles. ?>
+        <style>table.built-whitelist-table,.built-whitelist-empty{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-whitelist-table thead th{background:#1d2327;border-radius:6px}table.built-whitelist-table tbody td,table.built-whitelist-table thead th{padding:5px 10px}table.built-whitelist-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-whitelist-table tbody tr:last-child td{border-bottom:none!important}table.built-whitelist-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-whitelist-table tbody td input[type=submit]:hover{background:0 0}.built-whitelist-add{margin: 0 0 15px 0;}.built-whitelist-empty{width: calc(100% - 30px);}</style><?php
+
+        // Output.
+        echo ob_get_clean();
 
     }
 
@@ -75,7 +160,7 @@ class builtAdmin {
         $db = new \BuiltMightyProtect\builtProtectionDB();
         
         // Get recent blacklist.
-        $query = "SELECT * FROM $db->table ORDER BY id DESC LIMIT 10"; 
+        $query = "SELECT * FROM $db->protect ORDER BY id DESC LIMIT 10"; 
         
         // Get blacklist.
         $blacklist = $db->request( $query, 'results' ); ?>
@@ -109,7 +194,7 @@ class builtAdmin {
 
                         <tr>
                             <td><?php echo $item['ip']; ?></td>
-                            <td><?php echo $item['order_id']; ?></td>
+                            <td><a href="<?php echo admin_url( '/admin.php?page=wc-orders&action=edit&id=' . $item['order_id'] ); ?>" style="text-decoration:none;color:red" target="_blank">#<?php echo $item['order_id']; ?></a></td>
                             <td><?php echo $item['date']; ?></td>
                             <td><input type="submit" name="built-remove-<?php echo $item['id']; ?>" value="×"></td>
                         </tr><?php
@@ -117,10 +202,12 @@ class builtAdmin {
                     } ?>
 
                 </tbody>
-            </table>
-            <style>table.built-blacklist-table{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-blacklist-table thead th{background:#1d2327;border-radius:6px}table.built-blacklist-table tbody td,table.built-blacklist-table thead th{padding:5px 10px}table.built-blacklist-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-blacklist-table tbody tr:last-child td{border-bottom:none!important}table.built-blacklist-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-blacklist-table tbody td input[type=submit]:hover{background:0 0}</style><?php
+            </table><?php
 
         }
+        
+        // Styles. ?>
+        <style>table.built-blacklist-table,.built-blacklist-empty{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-blacklist-table thead th{background:#1d2327;border-radius:6px}table.built-blacklist-table tbody td,table.built-blacklist-table thead th{padding:5px 10px}table.built-blacklist-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-blacklist-table tbody tr:last-child td{border-bottom:none!important}table.built-blacklist-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-blacklist-table tbody td input[type=submit]:hover{background:0 0}.built-blacklist-empty{width: calc(100% - 30px);}</style><?php
 
         // Output.
         echo ob_get_clean();
@@ -228,7 +315,37 @@ class builtAdmin {
     }
 
     /**
-     * Remove IP from blacklist.
+     * Add IP to whitelist.
+     * 
+     * @param   array   $data   POST data.
+     * 
+     * @since   1.0.0
+     */
+    public function add( $data ) {
+
+        // Loop through data.
+        foreach( $_POST as $key => $value ) {
+
+            // Check if remove.
+            if( strpos( $key, 'built-whitelist-ip' ) !== false ) {
+
+                // Get IP.
+                $ip = $value;
+
+                // Actions.
+                $action = new \BuiltMightyProtect\builtActions();
+
+                // Add.
+                $action->whitelist_ip( $ip );
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Remove IP from blacklist or whitelist.
      * 
      * @param   array   $data   POST data.
      * 
@@ -245,13 +362,22 @@ class builtAdmin {
                 // Get ID.
                 $id = str_replace( 'built-remove-', '', $key );
 
-                error_log( 'ID to remove: ' . $id );
-
                 // Load database class.
                 $db = new \BuiltMightyProtect\builtProtectionDB();
 
                 // Remove.
-                $db->delete( [ 'id' => (int)$id ] );
+                $db->delete( $db->protect, [ 'id' => (int)$id ] );
+
+            } elseif( strpos( $key, 'built-whitelist-remove' ) !== false ) {
+
+                // Get the ID.
+                $id = str_replace( 'built-whitelist-remove-', '', $key );
+
+                // Load the database class.
+                $db = new \BuiltMightyProtect\builtProtectionDB();
+
+                // Remove.
+                $db->delete( $db->whitelist, [ 'id' => (int)$id ] );
 
             }
 

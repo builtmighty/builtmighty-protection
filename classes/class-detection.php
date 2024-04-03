@@ -78,8 +78,11 @@ class builtDetection {
                 )
             );
 
+            // Actions.
+            $action = new \BuiltMightyProtect\builtActions();
+
             // Add IP to blacklist.
-            $this->blacklist_ip( $ip, $order_id );
+            $action->blacklist_ip( $ip, $order_id );
 
         }
 
@@ -136,43 +139,13 @@ class builtDetection {
                 )
             );
 
+            // Actions.
+            $action = new \BuiltMightyProtect\builtActions();
+
             // Add IP to blacklist.
-            $this->blacklist_ip( $ip, $order_id );
+            $action->blacklist_ip( $ip, $order_id );
 
         }
-
-    }
-
-    /**
-     * Blacklist IP.
-     * 
-     * Add specified IP address to blacklist.
-     * 
-     * @param   string  $ip         IP address to blacklist.
-     * @param   int     $order_id   Order ID.
-     * 
-     * @since   1.0.0
-     */
-    public function blacklist_ip( $ip, $order_id ) {
-
-        // Database.
-        $db = new \BuiltMightyProtect\builtProtectionDB();
-
-        // Set query.
-        $query = "SELECT id FROM $db->table WHERE ip = '$ip'";
-
-        // Check if IP is already blacklisted.
-        if( $db->request( $query, 'row' ) ) return;
-
-        // Set data.
-        $data = [
-            'ip'        => $ip,
-            'order_id'  => $order_id,
-            'date'      => date( 'Y-m-d H:i:s' )
-        ];
-
-        // Insert data.
-        $db->insert( $data );
 
     }
 

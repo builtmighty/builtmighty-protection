@@ -30,10 +30,13 @@ class builtProtection {
      * 
      * @since   1.0.0
      */
-    public function protect() {
+    public function protect( $ip = NULL ) {
+
+        // Check if IP is null.
+        $ip = ( NULL === $ip ) ? $this->get_ip() : $ip;
 
         // Check for blacklisted IP.
-        if( $this->block( $this->get_ip() ) ) {
+        if( $this->block( $ip ) ) {
 
             // Die.
             wp_die( 'Access denied. You have been blocked from accessing this site.' );
@@ -71,7 +74,7 @@ class builtProtection {
         $db = new \BuiltMightyProtect\builtProtectionDB();
 
         // Get blacklist.
-        $blacklist = $db->request( "SELECT id FROM {$db->table} WHERE ip = '{$ip}'", 'row' );
+        $blacklist = $db->request( "SELECT id FROM {$db->protect} WHERE ip = '{$ip}'", 'row' );
 
         // Return.
         return ( empty( $blacklist ) ) ? false : true;
