@@ -60,20 +60,20 @@ class builtAdmin {
         // Settings.
         woocommerce_admin_fields( $this->get_settings() );
 
-        // Whitelist.
-        $this->get_whitelist();
+        // Bypass.
+        $this->get_bypass();
 
-        // Blacklist.
-        $this->get_blacklist();
+        // Blocklist.
+        $this->get_blocklist();
 
     }
 
     /**
-     * Whitelist.
+     * Bypass.
      * 
      * @since   1.0.0
      */
-    public function get_whitelist() {
+    public function get_bypass() {
 
         // Start output buffering.
         ob_start();
@@ -81,38 +81,38 @@ class builtAdmin {
         // Get database class.
         $db = new \BuiltMightyProtect\builtProtectionDB();
         
-        // Get recent blacklist.
-        $query = "SELECT * FROM $db->whitelist ORDER BY id DESC LIMIT 10"; 
+        // Get recent blocklist.
+        $query = "SELECT * FROM $db->bypass ORDER BY id DESC LIMIT 10"; 
         
-        // Get whitelist.
-        $whitelist = $db->request( $query, 'results' );
+        // Get bypass.
+        $bypass = $db->request( $query, 'results' );
         
         // Get IP.
         $ip = ( NULL !== WC_Geolocation::get_ip_address() ) ? WC_Geolocation::get_ip_address() : $_SERVER['REMOTE_ADDR']; ?>
 
-        <h2>Whitelist</h2>
-        <p>Add an IP address to the whitelist, so that it isn't blocked from accessing the site. Your IP is: <code><?php echo $ip; ?></code><?php
+        <h2>Bypass</h2>
+        <p>Add an IP address to the bypass, so that it isn't blocked from accessing the site. Your IP is: <code><?php echo $ip; ?></code><?php
 
-        // Add to whitelist. ?>
-        <div class="built-whitelist-add">
+        // Add to bypass. ?>
+        <div class="built-bypass-add">
             <form method="post">
-                <input type="text" name="built-whitelist-ip" placeholder="IP Address">
-                <input type="submit" class="button-primary woocommerce-save-button" name="built-whitelist-add" value="+">
+                <input type="text" name="built-bypass-ip" placeholder="IP Address">
+                <input type="submit" class="button-primary woocommerce-save-button" name="built-bypass-add" value="+">
             </form>
         </div><?php
 
         // Check if empty.
-        if( empty( $whitelist ) ) {
+        if( empty( $bypass ) ) {
 
             // Output. ?>
-            <div class="built-whitelist built-whitelist-empty">
-                <p>Whitelist Empty</p>
+            <div class="built-bypass built-bypass-empty">
+                <p>Bypass Empty</p>
             </div><?php
             
         } else {
 
             // Output. ?>
-            <table class="built-whitelist-table">
+            <table class="built-bypass-table">
                 <thead>
                     <tr>
                         <th>IP</th>
@@ -122,13 +122,13 @@ class builtAdmin {
                 </thead>
                 <tbody><?php
 
-                    // Loop through whitelist.
-                    foreach( $whitelist as $item ) { ?>
+                    // Loop through bypass.
+                    foreach( $bypass as $item ) { ?>
 
                         <tr>
                             <td><?php echo $item['ip']; ?></td>
                             <td><?php echo $item['date']; ?></td>
-                            <td><input type="submit" name="built-whitelist-remove-<?php echo $item['id']; ?>" value="×"></td>
+                            <td><input type="submit" name="built-bypass-remove-<?php echo $item['id']; ?>" value="×"></td>
                         </tr><?php
 
                     } ?>
@@ -139,7 +139,7 @@ class builtAdmin {
         }
         
         // Styles. ?>
-        <style>table.built-whitelist-table,.built-whitelist-empty{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-whitelist-table thead th{background:#1d2327;border-radius:6px}table.built-whitelist-table tbody td,table.built-whitelist-table thead th{padding:5px 10px}table.built-whitelist-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-whitelist-table tbody tr:last-child td{border-bottom:none!important}table.built-whitelist-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-whitelist-table tbody td input[type=submit]:hover{background:0 0}.built-whitelist-add{margin: 0 0 15px 0;}.built-whitelist-empty{width: calc(100% - 30px);}</style><?php
+        <style>table.built-bypass-table,.built-bypass-empty{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-bypass-table thead th{background:#1d2327;border-radius:6px}table.built-bypass-table tbody td,table.built-bypass-table thead th{padding:5px 10px}table.built-bypass-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-bypass-table tbody tr:last-child td{border-bottom:none!important}table.built-bypass-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-bypass-table tbody td input[type=submit]:hover{background:0 0}.built-bypass-add{margin: 0 0 15px 0;}.built-bypass-empty{width: calc(100% - 30px);}</style><?php
 
         // Output.
         echo ob_get_clean();
@@ -147,11 +147,11 @@ class builtAdmin {
     }
 
     /**
-     * Blacklist.
+     * Blocklist.
      * 
      * @since   1.0.0
      */
-    public function get_blacklist() {
+    public function get_blocklist() {
 
         // Start output buffering.
         ob_start();
@@ -159,26 +159,26 @@ class builtAdmin {
         // Get database class.
         $db = new \BuiltMightyProtect\builtProtectionDB();
         
-        // Get recent blacklist.
-        $query = "SELECT * FROM $db->protect ORDER BY id DESC LIMIT 10"; 
+        // Get recent blocklist.
+        $query = "SELECT * FROM $db->blocklist ORDER BY id DESC LIMIT 10"; 
         
-        // Get blacklist.
-        $blacklist = $db->request( $query, 'results' ); ?>
+        // Get blocklist.
+        $blocklist = $db->request( $query, 'results' ); ?>
 
-        <h2>Blacklist</h2><?php
+        <h2>Blocklist</h2><?php
 
         // Check if empty.
-        if( empty( $blacklist ) ) {
+        if( empty( $blocklist ) ) {
 
             // Output. ?>
-            <div class="built-blacklist built-blacklist-empty">
-                <p>Blacklist Empty</p>
+            <div class="built-blocklist built-blocklist-empty">
+                <p>Blocklist Empty</p>
             </div><?php
             
         } else {
 
             // Output. ?>
-            <table class="built-blacklist-table">
+            <table class="built-blocklist-table">
                 <thead>
                     <tr>
                         <th>IP</th>
@@ -189,8 +189,8 @@ class builtAdmin {
                 </thead>
                 <tbody><?php
 
-                    // Loop through blacklist.
-                    foreach( $blacklist as $item ) { ?>
+                    // Loop through blocklist.
+                    foreach( $blocklist as $item ) { ?>
 
                         <tr>
                             <td><?php echo $item['ip']; ?></td>
@@ -207,7 +207,7 @@ class builtAdmin {
         }
         
         // Styles. ?>
-        <style>table.built-blacklist-table,.built-blacklist-empty{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-blacklist-table thead th{background:#1d2327;border-radius:6px}table.built-blacklist-table tbody td,table.built-blacklist-table thead th{padding:5px 10px}table.built-blacklist-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-blacklist-table tbody tr:last-child td{border-bottom:none!important}table.built-blacklist-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-blacklist-table tbody td input[type=submit]:hover{background:0 0}.built-blacklist-empty{width: calc(100% - 30px);}</style><?php
+        <style>table.built-blocklist-table,.built-blocklist-empty{background:#2c3338;width:100%;color:#fff;padding:15px;border-radius:6px;text-align:left}table.built-blocklist-table thead th{background:#1d2327;border-radius:6px}table.built-blocklist-table tbody td,table.built-blocklist-table thead th{padding:5px 10px}table.built-blocklist-table tbody td{border-bottom:1px solid rgb(255 255 255 / 10%)}table.built-blocklist-table tbody tr:last-child td{border-bottom:none!important}table.built-blocklist-table tbody td input[type=submit]{background:red;border-radius:100%;border:1px solid red;color:#fff;display:flex;width:24px;height:24px;align-content:center;justify-content:center;font-weight:700;line-height:1;transition:.3s;-webkit-transition:.3s;-moz-transition:.3s;cursor:pointer}table.built-blocklist-table tbody td input[type=submit]:hover{background:0 0}.built-blocklist-empty{width: calc(100% - 30px);}</style><?php
 
         // Output.
         echo ob_get_clean();
@@ -315,7 +315,7 @@ class builtAdmin {
     }
 
     /**
-     * Add IP to whitelist.
+     * Add IP to bypass.
      * 
      * @param   array   $data   POST data.
      * 
@@ -327,7 +327,7 @@ class builtAdmin {
         foreach( $_POST as $key => $value ) {
 
             // Check if remove.
-            if( strpos( $key, 'built-whitelist-ip' ) !== false ) {
+            if( strpos( $key, 'built-bypass-ip' ) !== false ) {
 
                 // Get IP.
                 $ip = $value;
@@ -336,7 +336,7 @@ class builtAdmin {
                 $action = new \BuiltMightyProtect\builtActions();
 
                 // Add.
-                $action->whitelist_ip( $ip );
+                $action->bypass_ip( $ip );
 
             }
 
@@ -345,7 +345,7 @@ class builtAdmin {
     }
 
     /**
-     * Remove IP from blacklist or whitelist.
+     * Remove IP from blocklist or bypass.
      * 
      * @param   array   $data   POST data.
      * 
@@ -366,18 +366,18 @@ class builtAdmin {
                 $db = new \BuiltMightyProtect\builtProtectionDB();
 
                 // Remove.
-                $db->delete( $db->protect, [ 'id' => (int)$id ] );
+                $db->delete( $db->blocklist, [ 'id' => (int)$id ] );
 
-            } elseif( strpos( $key, 'built-whitelist-remove' ) !== false ) {
+            } elseif( strpos( $key, 'built-bypass-remove' ) !== false ) {
 
                 // Get the ID.
-                $id = str_replace( 'built-whitelist-remove-', '', $key );
+                $id = str_replace( 'built-bypass-remove-', '', $key );
 
                 // Load the database class.
                 $db = new \BuiltMightyProtect\builtProtectionDB();
 
                 // Remove.
-                $db->delete( $db->whitelist, [ 'id' => (int)$id ] );
+                $db->delete( $db->bypass, [ 'id' => (int)$id ] );
 
             }
 

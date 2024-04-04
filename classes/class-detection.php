@@ -81,8 +81,8 @@ class builtDetection {
             // Actions.
             $action = new \BuiltMightyProtect\builtActions();
 
-            // Add IP to blacklist.
-            $action->blacklist_ip( $ip, $order_id );
+            // Add IP to blocklist.
+            $action->blocklist_ip( $ip, $order_id );
 
         }
 
@@ -142,8 +142,8 @@ class builtDetection {
             // Actions.
             $action = new \BuiltMightyProtect\builtActions();
 
-            // Add IP to blacklist.
-            $action->blacklist_ip( $ip, $order_id );
+            // Add IP to blocklist.
+            $action->blocklist_ip( $ip, $order_id );
 
         }
 

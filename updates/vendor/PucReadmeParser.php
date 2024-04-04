@@ -227,7 +227,7 @@ class PucReadmeParser {
 		}
 	}
 
-	function user_sanitize( $text, $strict = false ) { // whitelisted chars
+	function user_sanitize( $text, $strict = false ) { // bypassed chars
 		if ( function_exists('user_sanitize') ) // bbPress native
 			return user_sanitize( $text, $strict );
 

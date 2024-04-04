@@ -108,14 +108,26 @@ class builtOrders {
 
             } ?>
 
-        </div>
+        </div><?php
+
+        // Check if order is administrator.
+        if( $order->get_customer_id() !== 0 ) {
+
+            // Get user.
+            $user = get_user_by( 'ID', $order->get_customer_id() );
+
+            // If user is admin, stop.
+            if( in_array( 'administrator', $user->roles ) ) return;
+
+        } ?>
+
         <div class="built-protect-order built-protect-order-actions" data-ip="<?php echo $order->get_customer_ip_address(); ?>"><?php
 
             // Check if blocked.
             if( $status->block( $order->get_customer_ip_address() ) ) {
 
                 // Blocked. ?>
-                <div class="built-protect-order-status">
+                <div class="built-protect-order-status" style="font-weight:bold;color:red">
                     <span class="dashicons dashicons-no-alt"></span> Blocked
                 </div><?php
 
@@ -127,8 +139,8 @@ class builtOrders {
             } else {
 
                 // Not blocked. ?>
-                <div class="built-protect-order-status">
-                    <span class="dashicons dashicons-yes-alt"></span> Unblocked
+                <div class="built-protect-order-status" style="font-weight:bold;color:green">
+                    <span class="dashicons dashicons-yes-alt"></span> Not Blocked
                 </div><?php
 
                 // Block. ?>
@@ -152,6 +164,8 @@ class builtOrders {
      */
     public function order_save( $order_id ) {
 
+        error_log( 'Order Save' );
+
         // Check for assessment.
         if( ! empty( $_POST['built_assess'] ) ) {
 
@@ -166,16 +180,18 @@ class builtOrders {
             // Actions.
             $action = new \BuiltMightyProtect\builtActions();
 
-            // Add IP to blacklist.
-            $action->blacklist_ip( $_POST['built_block'], $_POST['post_ID'] );
+            error_log( print_r( $_POST, true ) );
+
+            // Add IP to blocklist.
+            $action->blocklist_ip( $_POST['built_block'], $_POST['post_ID'] );
 
         } elseif( ! empty( $_POST['built_unblock'] ) ) {
 
             // Actions.
             $action = new \BuiltMightyProtect\builtActions();
 
-            // Remove IP from blacklist.
-            $action->blacklist_remove( $_POST['built_unblock'] );
+            // Remove IP from blocklist.
+            $action->blocklist_remove( $_POST['built_unblock'] );
 
         }
 

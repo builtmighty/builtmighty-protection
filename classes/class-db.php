@@ -29,8 +29,8 @@ class builtProtectionDB {
         // Set variables.
         $this->db           = $wpdb;
         $this->prefix       = $table_prefix;
-        $this->protect      = $table_prefix . 'built_protect';
-        $this->whitelist    = $table_prefix . 'built_whitelist';
+        $this->blocklist    = $table_prefix . 'built_blocklist';
+        $this->bypass       = $table_prefix . 'built_bypass';
 
     }
 
@@ -169,13 +169,13 @@ class builtProtectionDB {
 
         // Set.
         $structure = [
-            'built_protect'     => [
+            'built_blocklist'     => [
                 'id'        => 'int(11) NOT NULL AUTO_INCREMENT',
                 'ip'        => 'varchar(255) NOT NULL',
                 'order_id'  => 'int(11) NOT NULL',
                 'date'      => 'datetime NOT NULL',
             ],
-            'built_whitelist'   => [
+            'built_bypass'   => [
                 'id'        => 'int(11) NOT NULL AUTO_INCREMENT',
                 'ip'        => 'varchar(255) NOT NULL',
                 'date'      => 'datetime NOT NULL',

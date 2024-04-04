@@ -2,7 +2,7 @@
 /**
  * Protection.
  * 
- * Block blacklisted IPs from accessing the site.
+ * Block IPs from accessing the site.
  * 
  * @package Built Mighty Protection
  * @since   1.0.0
@@ -18,8 +18,11 @@ class builtProtection {
      */
     public function __construct() {
 
-        // Load on init.
-        add_action( 'init', [ $this, 'protect' ] );
+        // Load on wp.
+        add_action( 'wp', [ $this, 'protect' ] );
+
+        // Prevent order placement.
+        add_action( 'woocommerce_checkout_process', [ $this, 'protect_orders' ] );
 
     }
 
@@ -30,16 +33,32 @@ class builtProtection {
      * 
      * @since   1.0.0
      */
-    public function protect( $ip = NULL ) {
+    public function protect() {
 
-        // Check if IP is null.
-        $ip = ( NULL === $ip ) ? $this->get_ip() : $ip;
-
-        // Check for blacklisted IP.
-        if( $this->block( $ip ) ) {
+        // Check for blocklisted IP.
+        if( $this->block( $this->get_ip() ) ) {
 
             // Die.
-            wp_die( 'Access denied. You have been blocked from accessing this site.' );
+            wp_die( 'Access denied. You have been blocked from accessing this site. If you think this has been done in error, please contact us.' );
+
+        }
+
+    }
+
+    /**
+     * Protect orders.
+     * 
+     * Block bad IPs.
+     * 
+     * @since   1.0.0
+     */
+    public function protect_orders() {
+
+        // Check for blocklisted IP.
+        if( $this->block( $this->get_ip() ) ) {
+
+            // Block the checkout process and notify the user.
+            wc_add_notice( __( 'Access denied. You have been blocked from placing orders on this site. If you think this has been done in error, please contact us.', BUILT_PROTECT_NAME ), 'error' );
 
         }
 
@@ -62,7 +81,7 @@ class builtProtection {
     /**
      * Check if user is blocked.
      * 
-     * Check the list of blacklisted IPs.
+     * Check the list of blocklisted IPs.
      * 
      * @param   string  $ip IP address to check.
      * 
@@ -73,11 +92,11 @@ class builtProtection {
         // Get database class.
         $db = new \BuiltMightyProtect\builtProtectionDB();
 
-        // Get blacklist.
-        $blacklist = $db->request( "SELECT id FROM {$db->protect} WHERE ip = '{$ip}'", 'row' );
+        // Get blocklist.
+        $blocklist = $db->request( "SELECT id FROM {$db->blocklist} WHERE ip = '{$ip}'", 'row' );
 
         // Return.
-        return ( empty( $blacklist ) ) ? false : true;
+        return ( empty( $blocklist ) ) ? false : true;
 
     }
 

@@ -151,7 +151,7 @@ if ( !class_exists(Extension::class, false) ):
 
 			//phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_error_reporting -- Part of a debugging feature.
 			error_reporting(E_ALL);
-			//phpcs:ignore WordPress.PHP.IniSet.display_errors_Blacklisted
+			//phpcs:ignore WordPress.PHP.IniSet.display_errors_blocklisted
 			@ini_set('display_errors', 'On');
 		}
 

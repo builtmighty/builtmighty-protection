@@ -95,6 +95,34 @@ new \BuiltMightyProtect\builtProtection();
 new \BuiltMightyProtect\builtAssessment();
 new \BuiltMightyProtect\builtOrders();
 
+/** 
+ * CLI.
+ * 
+ * @since   1.0.0
+ */
+if( defined( 'WP_CLI' ) && WP_CLI ) {
+
+    // Register.
+    add_action( 'plugins_loaded', 'built_protect_register_cli' );
+
+}
+
+/**
+ * Register CLI.
+ * 
+ * @since   1.0.0
+ */
+function built_protect_register_cli() {
+
+    // Require CLI class.
+    require_once BUILT_PROTECT_PATH . 'classes/class-cli.php';
+
+    // Register CLI.
+    WP_CLI::add_command( 'protect', '\BuiltMightyProtect\builtCLI' );
+
+}
+
+
 /**
  * Plugin Updates. 
  * 
