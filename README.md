@@ -9,7 +9,7 @@ Install, as you would any other plugin, and go to WooCommerce > Settings > "🛡
 ## CLI
 The plugin comes with CLI commands, so that you can block or bypass IPs as needed. The following commands are available
 
-#### wp protect block
+### wp protect block
 Block commands center around blocking IPs, removing IPs from the block list, and listing the block list.
 
 ```
@@ -27,7 +27,7 @@ wp protect block list
 ```
 Get a list of blocked IPs.
 
-#### wp protect bypass
+### wp protect bypass
 Bypass commands center around allowing IPs to not be banned from access the site or placing orders.
 
 ```
