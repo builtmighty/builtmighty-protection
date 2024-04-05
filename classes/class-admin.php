@@ -95,10 +95,8 @@ class builtAdmin {
 
         // Add to bypass. ?>
         <div class="built-bypass-add">
-            <form method="post">
-                <input type="text" name="built-bypass-ip" placeholder="IP Address">
-                <input type="submit" class="button-primary woocommerce-save-button" name="built-bypass-add" value="+">
-            </form>
+            <input type="text" name="built-bypass-ip" placeholder="IP Address">
+            <input type="submit" class="button-primary woocommerce-save-button" name="built-bypass-add" value="+">
         </div><?php
 
         // Check if empty.
@@ -307,6 +305,28 @@ class builtAdmin {
                 'type'      => 'sectionend',
                 'id'        => 'wc_settings_assess_end'
             ],
+            'section_dispute_title' => [
+                'name'      => __( 'Dispute', BUILT_PROTECT_DOMAIN ),
+                'type'      => 'title',
+                'desc'      => 'Give customers a way to dispute the block, if blocked.',
+                'id'        => 'dispute_section_title'
+            ],
+            [
+                'name'      => __( 'Enable', BUILT_PROTECT_DOMAIN ),
+                'type'      => 'checkbox',
+                'desc'      => 'Enable Dispute',
+                'id'        => 'built_dispute'
+            ],
+            [
+                'name'      => __( 'Email Address', BUILT_PROTECT_DOMAIN ),
+                'type'      => 'email',
+                'desc'      => 'Add an email address where blocked customers can contact to dispute the block.',
+                'id'        => 'built_dispute_email'
+            ],
+            'section_dispute_end' => [
+                'type'      => 'sectionend',
+                'id'        => 'wc_settings_dispute_end'
+            ],
         ];
 
         // Return.
@@ -327,7 +347,7 @@ class builtAdmin {
         foreach( $_POST as $key => $value ) {
 
             // Check if remove.
-            if( strpos( $key, 'built-bypass-ip' ) !== false ) {
+            if( strpos( $key, 'built-bypass-ip' ) !== false && ! empty( $value ) ) {
 
                 // Get IP.
                 $ip = $value;

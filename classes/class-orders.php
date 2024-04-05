@@ -164,13 +164,20 @@ class builtOrders {
      */
     public function order_save( $order_id ) {
 
-        error_log( 'Order Save' );
+        // Get order.
+        $order = wc_get_order( $order_id );
+
+        // Get user.
+        $user = get_user_by( 'ID', get_current_user_id() );
 
         // Check for assessment.
         if( ! empty( $_POST['built_assess'] ) ) {
 
             // Get assessment.
             $assess = new \BuiltMightyProtect\builtAssessment();
+
+            // Add an order note of who assessed.
+            $order->add_order_note( 'Order assessment triggered by <a href="' . admin_url( '/user-edit.php?user_id=' . $user->ID ) . '" target="_blank">' . $user->user_login . '</a>.' );
 
             // Assess order.
             $assess->assess_order( (int)$_POST['built_assess'] );
@@ -180,7 +187,8 @@ class builtOrders {
             // Actions.
             $action = new \BuiltMightyProtect\builtActions();
 
-            error_log( print_r( $_POST, true ) );
+            // Add an order note of who blocked.
+            $order->add_order_note( 'Customer of order <strong style="color:red">blocked</strong> by <a href="' . admin_url( '/user-edit.php?user_id=' . $user->ID ) . '" target="_blank">' . $user->user_login . '</a>.' );
 
             // Add IP to blocklist.
             $action->blocklist_ip( $_POST['built_block'], $_POST['post_ID'] );
@@ -189,6 +197,9 @@ class builtOrders {
 
             // Actions.
             $action = new \BuiltMightyProtect\builtActions();
+
+            // Add an order note of who unblocked.
+            $order->add_order_note( 'Customer of order <strong style="color:green">unblocked</strong> by <a href="' . admin_url( '/user-edit.php?user_id=' . $user->ID ) . '" target="_blank">' . $user->user_login . '</a>.' );
 
             // Remove IP from blocklist.
             $action->blocklist_remove( $_POST['built_unblock'] );

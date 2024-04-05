@@ -114,11 +114,13 @@ if( defined( 'WP_CLI' ) && WP_CLI ) {
  */
 function built_protect_register_cli() {
 
-    // Require CLI class.
-    require_once BUILT_PROTECT_PATH . 'classes/class-cli.php';
+    // Require CLI classes.
+    require_once BUILT_PROTECT_PATH . 'classes/cli/class-block.php';
+    require_once BUILT_PROTECT_PATH . 'classes/cli/class-bypass.php';
 
-    // Register CLI.
-    WP_CLI::add_command( 'protect', '\BuiltMightyProtect\builtCLI' );
+    // Register CLI classes.
+    WP_CLI::add_command( 'protect block', '\BuiltMightyProtect\builtCLIBlock' );
+    WP_CLI::add_command( 'protect bypass', '\BuiltMightyProtect\builtCLIBypass' );
 
 }
 
