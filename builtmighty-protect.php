@@ -41,15 +41,15 @@ if( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', 
  * 
  * @since   1.0.0
  */
-require_once BUILT_PROTECT_PATH . 'classes/class-db.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-admin.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-assessment.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-actions.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-mail.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-columns.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-orders.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-detection.php';
-require_once BUILT_PROTECT_PATH . 'classes/class-protection.php';
+require_once BUILT_PROTECT_PATH . 'classes/core/class-db.php';
+require_once BUILT_PROTECT_PATH . 'classes/users/class-mail.php';
+require_once BUILT_PROTECT_PATH . 'classes/admin/class-admin.php';
+require_once BUILT_PROTECT_PATH . 'classes/core/class-actions.php';
+require_once BUILT_PROTECT_PATH . 'classes/core/class-assessment.php';
+require_once BUILT_PROTECT_PATH . 'classes/core/class-detection.php';
+require_once BUILT_PROTECT_PATH . 'classes/core/class-protection.php';
+require_once BUILT_PROTECT_PATH . 'classes/admin/class-columns.php';
+require_once BUILT_PROTECT_PATH . 'classes/users/class-orders.php';
 
 /** 
  * On activation.
