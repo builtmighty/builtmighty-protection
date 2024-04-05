@@ -12,25 +12,37 @@ The plugin comes with CLI commands, so that you can block or bypass IPs as neede
 #### wp protect block
 Block commands center around blocking IPs, removing IPs from the block list, and listing the block list.
 
-`wp protect block add --ip=123.123.123.123`
+```
+wp protect block add --ip=123.123.123.123
+```
 Add an IP to the block list.
 
-`wp protect block remove --ip=123.123.123.123`
+```
+wp protect block remove --ip=123.123.123.123
+```
 Remove an IP from the block list.
 
-`wp protect block list`
+```
+wp protect block list
+```
 Get a list of blocked IPs.
 
 #### wp protect bypass
 Bypass commands center around allowing IPs to not be banned from access the site or placing orders.
 
-`wp protect bypass add --ip=123.123.123.123`
+```
+wp protect bypass add --ip=123.123.123.123
+```
 Add an IP to the bypass list.
 
-`wp protect bypass remove --ip=123.123.123.123`
+```
+wp protect bypass remove --ip=123.123.123.123
+```
 Remove an IP from the bypass list.
 
-`wp protect bypass list`
+```
+wp protect bypass list
+```
 Get a list of bypass IPs.
 
 ## 1.0.0
