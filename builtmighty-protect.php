@@ -130,11 +130,11 @@ function built_protect_register_cli() {
  * 
  * @since   1.0.0
  */
-// require BUILT_PROTECT_PATH . 'updates/plugin-update-checker.php';
-// use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-// $updates = PucFactory::buildUpdateChecker(
-// 	'https://github.com/builtmighty/builtmighty-kit',
-// 	__FILE__,
-// 	'builtmighty-kit'
-// );
-// $updates->setBranch( 'main' );
+require BUILT_PROTECT_PATH . 'updates/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+$updates = PucFactory::buildUpdateChecker(
+	'https://github.com/builtmighty/builtmighty-protection',
+	__FILE__,
+	'builtmighty-protection'
+);
+$updates->setBranch( 'main' );
